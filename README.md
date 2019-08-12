@@ -1,4 +1,3 @@
-Patricia
 
 [//]: # (Image References)
 
