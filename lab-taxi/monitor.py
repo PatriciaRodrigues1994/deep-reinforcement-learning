@@ -26,17 +26,40 @@ def interact(env, agent, num_episodes=20000, window=100):
     samp_rewards = deque(maxlen=window)
     # for each episode
     for i_episode in range(1, num_episodes+1):
+        # set epsilon
+        
+        eps = 1.0 / i_episode
+        
+            
+        gamma = 1.0
+        # set gamma
+        alpha = 0.045
+
+        # if i_episode < 10000:
+        #     alpha = 0.05
+        # elif i_episode >= 10000 and i_episode <= 15000:
+        #     alpha = 0.03
+        # else:
+        #     alpha = 0.015
+
+        # if i_episode >= 10000 and i_episode <= 15000:
+        #     alpha = 0.03
+        # elif i_episode < 10000:
+        #     alpha = 0.05
+        # else:
+        #     alpha = 0.05
+        # gamma = max(1.0**(i_episode), 0.05)
         # begin the episode
         state = env.reset()
         # initialize the sampled reward
         samp_reward = 0
         while True:
             # agent selects an action
-            action = agent.select_action(state)
+            action = agent.select_action(env, state, eps)
             # agent performs the selected action
             next_state, reward, done, _ = env.step(action)
             # agent performs internal updates based on sampled experience
-            agent.step(state, action, reward, next_state, done)
+            agent.step(state, action, reward, next_state, done,gamma, alpha, eps)
             # update the sampled reward
             samp_reward += reward
             # update the state (s <- s') to next time step
@@ -54,7 +77,8 @@ def interact(env, agent, num_episodes=20000, window=100):
             if avg_reward > best_avg_reward:
                 best_avg_reward = avg_reward
         # monitor progress
-        print("\rEpisode {}/{} || Best average reward {}".format(i_episode, num_episodes, best_avg_reward), end="")
+        print("\rEpisode {}/{} || Best average reward {} || {}".format(i_episode, num_episodes, best_avg_reward, alpha), end="")
+
         sys.stdout.flush()
         # check if task is solved (according to OpenAI Gym)
         if best_avg_reward >= 9.7:
